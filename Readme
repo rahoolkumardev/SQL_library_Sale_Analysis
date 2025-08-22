@@ -1,0 +1,199 @@
+# 📚 Library Database Project
+
+## 📖 Overview
+
+This project is a **Library Management Database** built using **PostgreSQL**.
+It contains tables for **Books, Customers, and Orders** and demonstrates how to manage and query data in a typical library or bookstore scenario.
+
+The project includes:
+
+* Database schema (tables with relationships)
+* Example queries (basic & advanced)
+* Use cases such as finding best-selling books, customers’ purchase history, and revenue calculations.
+
+---
+
+## 🗄️ Database Schema
+
+### **Tables**
+
+1. **Books**
+
+   * `Book_ID` (Primary Key)
+   * `Title`
+   * `Author`
+   * `Genre`
+   * `Published_Year`
+   * `Price`
+   * `Stock`
+
+2. **Customers**
+
+   * `Customer_ID` (Primary Key)
+   * `Name`
+   * `Email`
+   * `Phone`
+   * `City`
+   * `Country`
+
+3. **Orders**
+
+   * `C` (Primary Key, Order ID)
+   * `Customer_ID` (Foreign Key → Customers)
+   * `Book_ID` (Foreign Key → Books)
+   * `Order_Date`
+   * `Quantity`
+   * `Total_Amount`
+
+---
+
+## ⚡ Example Queries
+
+### Basic Queries
+
+* Retrieve all books in the *Fiction* genre:
+
+  ```sql
+  SELECT * FROM books WHERE genre = 'Fiction';
+  ```
+
+* Find books published after 1950:
+
+  ```sql
+  SELECT * FROM books WHERE published_year > 1950;
+  ```
+
+* List customers from *Canada*:
+
+  ```sql
+  SELECT * FROM customers WHERE country = 'Canada';
+  ```
+
+* Show orders placed in **November 2023**:
+
+  ```sql
+  SELECT * FROM orders
+  WHERE order_date BETWEEN '2023-11-01' AND '2023-11-30';
+  ```
+
+---
+
+### Aggregate Queries
+
+* Total stock of books:
+
+  ```sql
+  SELECT SUM(stock) FROM books;
+  ```
+
+* Most expensive book:
+
+  ```sql
+  SELECT * FROM books
+  ORDER BY price DESC
+  LIMIT 1;
+  ```
+
+* Customers who ordered more than 1 quantity:
+
+  ```sql
+  SELECT c.*, o.*
+  FROM orders o
+  JOIN customers c ON o.customer_id = c.customer_id
+  WHERE o.quantity > 1;
+  ```
+
+* Total revenue from all orders:
+
+  ```sql
+  SELECT ROUND(SUM(total_amount)) FROM orders;
+  ```
+
+---
+
+### Advanced Queries
+
+* Total number of books sold per genre:
+
+  ```sql
+  SELECT b.genre, SUM(o.quantity)
+  FROM orders o
+  JOIN books b ON o.book_id = b.book_id
+  GROUP BY b.genre;
+  ```
+
+* Average price of Fantasy books:
+
+  ```sql
+  SELECT ROUND(AVG(price)) AS avg_price
+  FROM books
+  WHERE genre = 'Fantasy';
+  ```
+
+* Customers with at least 2 orders:
+
+  ```sql
+  SELECT customer_id, COUNT(c) 
+  FROM orders
+  GROUP BY customer_id
+  HAVING COUNT(c) >= 2;
+  ```
+
+* Most frequently ordered book:
+
+  ```sql
+  SELECT book_id, COUNT(*) AS order_count
+  FROM orders
+  GROUP BY book_id
+  ORDER BY order_count DESC
+  LIMIT 1;
+  ```
+
+* Total quantity sold by each author:
+
+  ```sql
+  SELECT b.author, SUM(o.quantity) AS total_sold
+  FROM orders o
+  JOIN books b ON o.book_id = b.book_id
+  GROUP BY b.author;
+  ```
+
+* Customer who spent the most:
+
+  ```sql
+  SELECT c.customer_id, c.name, ROUND(SUM(o.total_amount)) AS total_spent
+  FROM orders o
+  JOIN customers c ON c.customer_id = o.customer_id
+  GROUP BY c.customer_id, c.name
+  ORDER BY total_spent DESC
+  LIMIT 1;
+  ```
+
+---
+
+## 🚀 How to Run
+
+1. Open PostgreSQL (psql or PgAdmin).
+2. Run the `library_database.sql` script to create tables and insert data.
+3. Execute queries one by one to test functionality.
+
+---
+
+## ✅ Features
+
+* Handles book inventory and sales.
+* Links customers to orders and orders to books.
+* Supports analytical queries (sales by genre, top spenders, revenue).
+* Demonstrates **joins, grouping, aggregation, and constraints** in SQL.
+
+---
+
+## 📌 Future Improvements
+
+* Add a `Return` table for returned books.
+* Track book availability with status updates.
+* Add triggers to auto-update stock when orders are placed.
+* Create views for commonly used reports (e.g., top authors, monthly revenue).
+
+---
+
